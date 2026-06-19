@@ -4,145 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Offer-to-REX demo · LJ Hooker Property Partners</title>
-<style>
-/* Offer-to-REX demo — shared styles (LJ Hooker Property Partners) */
-:root{
-  --ljh-yellow:#ffe512;
-  --ljh-yellow-d:#f5c400;
-  --ink:#1a1a1a;
-  --charcoal:#2b2b2b;
-  --grey:#6b6b6b;
-  --line:#e6e6e6;
-  --bg:#f4f5f7;
-  --card:#ffffff;
-  --ok:#1f9d55;
-  --bad:#d64545;
-  --info:#2563eb;
-  --radius:14px;
-  --shadow:0 2px 10px rgba(0,0,0,.06),0 8px 28px rgba(0,0,0,.05);
-  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.5}
-a{color:var(--info)}
-
-/* header */
-.topbar{background:var(--ink);color:#fff;display:flex;align-items:center;gap:14px;
-  padding:12px 20px;position:sticky;top:0;z-index:20}
-.brandmark{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
-.brandmark .chip{background:var(--ljh-yellow);color:#000;border-radius:6px;
-  padding:4px 8px;font-size:13px;font-weight:900}
-.brandmark small{display:block;font-weight:500;color:#cfcfcf;font-size:11px;letter-spacing:.4px}
-.topbar .role{margin-left:auto;font-size:12px;background:#000;border:1px solid #444;
-  padding:5px 10px;border-radius:999px;color:#ffe512}
-.demobanner{background:repeating-linear-gradient(45deg,#fff6c2,#fff6c2 12px,#ffefa0 12px,#ffefa0 24px);
-  color:#5b4a00;font-size:12.5px;text-align:center;padding:6px 12px;font-weight:600;border-bottom:1px solid #f0e08a}
-
-/* layout */
-.wrap{max-width:860px;margin:0 auto;padding:22px 18px 80px}
-.wrap.wide{max-width:1100px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-  box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
-h1{font-size:24px;margin:.2em 0 .1em}
-h2{font-size:17px;margin:0 0 14px;border-bottom:2px solid var(--ljh-yellow);
-  display:inline-block;padding-bottom:4px}
-.muted{color:var(--grey)}
-.small{font-size:13px}
-
-/* property hero */
-.hero{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
-.hero img{width:230px;height:150px;object-fit:cover;border-radius:10px;flex:0 0 auto;background:#ddd}
-.hero .meta{flex:1;min-width:220px}
-.hero .addr{font-size:19px;font-weight:800}
-.facts{display:flex;gap:16px;margin-top:8px;color:var(--charcoal);font-weight:600;font-size:14px;flex-wrap:wrap}
-.facts span{display:inline-flex;gap:5px;align-items:center}
-.pill{display:inline-block;background:var(--ljh-yellow);color:#000;font-weight:800;
-  border-radius:999px;padding:4px 12px;font-size:12px;margin-top:8px}
-
-/* form */
-.field{margin-bottom:14px}
-label{display:block;font-weight:600;font-size:14px;margin-bottom:5px}
-label .req{color:var(--bad)}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid #cfd4da;border-radius:9px;
-  font-size:15px;font-family:inherit;background:#fff}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ljh-yellow-d);
-  box-shadow:0 0 0 3px rgba(255,229,18,.35)}
-textarea{min-height:84px;resize:vertical}
-.row{display:flex;gap:14px;flex-wrap:wrap}
-.row > .field{flex:1;min-width:160px}
-.help{font-size:12px;color:var(--grey);margin-top:4px}
-fieldset{border:1px solid var(--line);border-radius:12px;padding:14px 16px 4px;margin:0 0 18px}
-legend{font-weight:700;font-size:14px;padding:0 6px;color:var(--charcoal)}
-.check{display:flex;gap:10px;align-items:flex-start}
-.check input{width:auto;margin-top:3px}
-
-/* buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
-  border:none;border-radius:10px;padding:13px 20px;font-size:15px;font-weight:800;font-family:inherit}
-.btn-primary{background:var(--ljh-yellow);color:#000}
-.btn-primary:hover{background:var(--ljh-yellow-d)}
-.btn-ok{background:var(--ok);color:#fff}
-.btn-bad{background:#fff;color:var(--bad);border:1px solid var(--bad)}
-.btn-ghost{background:#fff;color:var(--ink);border:1px solid #cfd4da}
-.btn[disabled]{opacity:.5;cursor:not-allowed}
-.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
-
-/* agent queue */
-.queue{display:grid;gap:14px}
-.offer-card{border:1px solid var(--line);border-left:5px solid var(--ljh-yellow);
-  border-radius:12px;padding:16px;background:#fff;cursor:pointer;transition:.15s}
-.offer-card:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
-.offer-card .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.offer-card .price{font-size:20px;font-weight:900}
-.badge{font-size:11px;font-weight:800;border-radius:999px;padding:3px 10px;text-transform:uppercase;letter-spacing:.4px}
-.badge.pending{background:#fff3cd;color:#8a6d00}
-.badge.approved{background:#dff3e6;color:var(--ok)}
-.badge.rejected{background:#fae0e0;color:var(--bad)}
-.kv{display:grid;grid-template-columns:160px 1fr;gap:6px 14px;font-size:14px;margin-top:6px}
-.kv dt{color:var(--grey)}
-.kv dd{margin:0;font-weight:600}
-.empty{text-align:center;color:var(--grey);padding:40px 10px}
-
-/* integration console */
-.console{background:#0d1117;color:#d6deeb;border-radius:12px;padding:14px;font-family:var(--mono);
-  font-size:12.5px;max-height:420px;overflow:auto}
-.console .line{padding:8px 10px;border-radius:8px;margin-bottom:8px;background:#161b22;border-left:3px solid #30363d}
-.console .line.REX{border-left-color:#f0a500}
-.console .line.Realworks{border-left-color:#4ea1ff}
-.console .tag{font-weight:800;font-size:11px;letter-spacing:.5px}
-.console .tag.REX{color:#f0a500}
-.console .tag.Realworks{color:#4ea1ff}
-.console pre{margin:6px 0 0;white-space:pre-wrap;word-break:break-word;color:#9fb3c8}
-.console .ttl{color:#fff}
-
-/* modal */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-start;
-  justify-content:center;padding:30px 14px;z-index:50;overflow:auto}
-.modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:16px;max-width:760px;width:100%;padding:0;overflow:hidden}
-.modal .mhead{background:var(--ink);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
-.modal .mbody{padding:20px}
-.modal .x{cursor:pointer;font-size:22px;line-height:1;color:#fff;background:none;border:none}
-.result-box{background:#f0fbf4;border:1px solid #bfe6cc;border-radius:12px;padding:16px;margin-top:8px}
-.result-box.bad{background:#fdf1f1;border-color:#f0c4c4}
-.result-box a{font-weight:700}
-
-/* qr / launcher */
-.steps{counter-reset:s;display:grid;gap:12px}
-.steps li{list-style:none;display:flex;gap:12px;align-items:flex-start}
-.steps li::before{counter-increment:s;content:counter(s);background:var(--ink);color:var(--ljh-yellow);
-  font-weight:800;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:13px}
-.launchgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:640px){.launchgrid{grid-template-columns:1fr}}
-.qrbox{text-align:center}
-.qrbox canvas,.qrbox img{background:#fff;padding:12px;border-radius:12px;border:1px solid var(--line)}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
-  padding:12px 18px;border-radius:10px;font-weight:600;box-shadow:var(--shadow);display:none;z-index:60}
-.toast.show{display:block}
-code.inline{background:#eef0f3;padding:2px 6px;border-radius:5px;font-family:var(--mono);font-size:12.5px}
-
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="demobanner">DEMO / PROOF-OF-CONCEPT · built for the sales team · APIs are simulated until live keys are added</div>
@@ -207,50 +69,7 @@ code.inline{background:#eef0f3;padding:2px 6px;border-radius:5px;font-family:var
 
 <div class="toast" id="toast"></div>
 
-<script>
-/* Shared listing catalog (real current LJ Hooker Property Partners listings).
-   Used by index.html (QR per listing), offer.html (prefill) and agent.html (seeding).
-   A real QR only needs ?listingId=<id> — the property is resolved from here. */
-(function (g) {
-  "use strict";
-  const LISTINGS = {
-    "13253616": {
-      listingId: "13253616",
-      ref: "LJHPP-13253616",
-      address: "120 West Sentinel Drive, Greenbank QLD 4124",
-      beds: "4", baths: "2", cars: "2", land: "350m²",
-      agent: "Mayank Patel · LJ Hooker Property Partners | Sunnybank Hills",
-      img: "https://www.homely.com.au/img-variant/l-Rex-13253616-1.jpg?named-transform=webHeroTransform&version=AFruA3pU5KiElo8xXRjuZ488qbCGpYd."
-    },
-    "13243059": {
-      listingId: "13243059",
-      ref: "LJHPP-13243059",
-      address: "9 Maibry Street, Wishart QLD 4122",
-      beds: "4", baths: "2", cars: "2", land: "750m²",
-      agent: "Kosma Comino · LJ Hooker Property Partners | Sunnybank Hills",
-      img: "https://www.homely.com.au/img-variant/l-Rex-13243059-1.jpg?named-transform=webHeroTransform&version=AzKuSx7pyzkbUm3JA4DJV_9Tm.hxnH2_"
-    }
-  };
-  const DEFAULT_ID = "13253616";
-
-  // resolve a listing from URL params: ?listingId wins; any explicit field overrides
-  function resolve(search) {
-    const qp = new URLSearchParams(search || "");
-    const id = qp.get("listingId");
-    const base = (id && LISTINGS[id]) ? LISTINGS[id] : LISTINGS[DEFAULT_ID];
-    const out = Object.assign({}, base);
-    ["listingId","ref","address","beds","baths","cars","land","agent","img"].forEach(k => {
-      if (qp.get(k)) out[k] = qp.get(k);
-    });
-    return out;
-  }
-
-  g.LISTINGS = LISTINGS;
-  g.LISTINGS_DEFAULT_ID = DEFAULT_ID;
-  g.resolveListing = resolve;
-})(window);
-
-</script>
+<script src="listings.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2400);}
@@ -285,4 +104,14 @@ function drawAll(){
       colorDark:"#1a1a1a",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
     cell.querySelector(".dl").addEventListener("click",()=>{
       const img=cell.querySelector(".qrt img")||cell.querySelector(".qrt canvas");
-      co
+      const dataUrl=img.tagName==="IMG"?img.src:img.toDataURL("image/png");
+      const a=document.createElement("a");a.href=dataUrl;a.download="offer-qr-"+L.listingId+".png";a.click();
+    });
+  });
+}
+document.getElementById("applyUrl").addEventListener("click",()=>{drawAll();toast("QR codes updated");});
+document.getElementById("qrLang").addEventListener("change",()=>{drawAll();toast("QR language updated");});
+drawAll();
+</script>
+</body>
+</html>
