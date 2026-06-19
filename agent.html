@@ -13,7 +13,7 @@
     <span class="chip">LJ</span>
     <span>HOOKER<small>PROPERTY PARTNERS</small></span>
   </div>
-  <button id="langToggle" class="role" style="cursor:pointer;border:1px solid #444">中文</button>
+  <button id="langToggle" class="role" style="cursor:pointer">中文</button>
   <span class="role" data-i18n="roleAgent">Agent · Emily Xiong</span>
 </header>
 
@@ -39,13 +39,9 @@
   </div>
 </div>
 
-<!-- review modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
-    <div class="mhead">
-      <strong id="mTitle">Review offer</strong>
-      <button class="x" id="mClose">×</button>
-    </div>
+    <div class="mhead"><strong id="mTitle">Review offer</strong><button class="x" id="mClose">×</button></div>
     <div class="mbody" id="mBody"></div>
   </div>
 </div>
@@ -57,24 +53,24 @@
 <script src="mock-api.js"></script>
 <script>
 const $ = (s,r=document)=>r.querySelector(s);
-const fmt = (n)=> "$"+Number(n||0).toLocaleString();
+const money = (n)=> "$"+Number(String(n||0).replace(/[^0-9.]/g,"")||0).toLocaleString();
+function esc(s){return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600);}
+function finText(d){return d.finance==="subject_to_finance" ? ("Subject to finance"+(d.lender?(" · "+d.lender):"")+(d.loanAmount?(" · "+money(d.loanAmount)):"")+(d.financeDate?(" · by "+d.financeDate):"")) : "Cash / not subject to finance";}
+function settleText(d){return d.settlementDate ? d.settlementDate : (d.settlementDays?(d.settlementDays+" days from contract"):"—");}
 
 function offerCard(o){
   const d=o.data;
   const badge = `<span class="badge ${o.status}">${o.status}</span>`;
-  const fin = d.finance==="subject_to_finance" ? "Subject to finance" : "Cash";
   return `<div class="offer-card" data-id="${o.id}">
-    <div class="top">
-      <div class="price">${fmt(d.offerPrice)}</div>${badge}
-    </div>
-    <div class="muted small">${d.address}</div>
+    <div class="top"><div class="price">${money(d.offerPrice)}</div>${badge}</div>
+    <div class="muted small">${esc(d.address)}</div>
     <dl class="kv">
-      <dt>Buyer</dt><dd>${d.buyer1Name||"—"}</dd>
-      <dt>Terms</dt><dd>${fin} · ${d.settlementDays||"?"} day settlement</dd>
+      <dt>Buyer</dt><dd>${esc(d.buyer1Name)||"—"}</dd>
+      <dt>Terms</dt><dd>${esc(finText(d))} · settle ${esc(settleText(d))}</dd>
       <dt>Received</dt><dd>${new Date(o.submittedAt).toLocaleString()}</dd>
       ${o.status==="approved" ? `<dt>REX offer</dt><dd>${o.integration.rexOfferId}</dd>` : ""}
-      ${o.status==="rejected" ? `<dt>Reason</dt><dd>${o.rejectReason||"—"}</dd>` : ""}
+      ${o.status==="rejected" ? `<dt>Reason</dt><dd>${esc(o.rejectReason)||"—"}</dd>` : ""}
     </dl>
   </div>`;
 }
@@ -83,57 +79,55 @@ function render(){
   const pend = MockApi.listOffers("pending");
   const dec  = MockApi.listOffers().filter(o=>o.status!=="pending");
   $("#pendCount").textContent = pend.length ? `(${pend.length})` : "";
-  $("#pending").innerHTML = pend.length ? pend.map(offerCard).join("")
-    : `<div class="empty">${t("emptyPending")}</div>`;
-  $("#decided").innerHTML = dec.length ? dec.map(offerCard).join("")
-    : `<div class="empty">${t("emptyDecided")}</div>`;
-  document.querySelectorAll(".offer-card").forEach(c=>{
-    c.addEventListener("click", ()=> openOffer(c.dataset.id));
-  });
+  $("#pending").innerHTML = pend.length ? pend.map(offerCard).join("") : `<div class="empty">${t("emptyPending")}</div>`;
+  $("#decided").innerHTML = dec.length ? dec.map(offerCard).join("") : `<div class="empty">${t("emptyDecided")}</div>`;
+  document.querySelectorAll(".offer-card").forEach(c=> c.addEventListener("click", ()=> openOffer(c.dataset.id)));
 }
 
 function consoleLine(e){
   const sys = e.system;
   const payload = e.request ? e.request : e.response;
   const label = e.request ? "REQUEST" : "RESPONSE";
-  return `<div class="line ${sys}">
-    <span class="tag ${sys}">${sys}</span> <span class="ttl">${e.title}</span>
-    <span class="muted" style="float:right">${label}</span>
-    <pre>${JSON.stringify(payload,null,2)}</pre>
-  </div>`;
+  return `<div class="line ${sys}"><span class="tag ${sys}">${sys}</span> <span class="ttl">${esc(e.title)}</span>
+    <span class="muted" style="float:right">${label}</span><pre>${esc(JSON.stringify(payload,null,2))}</pre></div>`;
 }
+
+function row(dt,dd){ return dd ? `<dt>${dt}</dt><dd>${dd}</dd>` : ""; }
 
 function openOffer(id){
   const o = MockApi.getOffer(id); if(!o) return;
   const d = o.data;
   const editable = o.status==="pending";
-  const fin = d.finance==="subject_to_finance"
-      ? `Subject to finance${d.financeDays?` · ${d.financeDays} days`:""}${d.lender?` · ${d.lender}`:""}`
-      : "Cash / not subject to finance";
-  const bp = d.bpDays ? `Subject to B&amp;P · ${d.bpDays} days` : "Waived";
+  const buyer1Addr = [d.buyer1Street,d.buyer1Suburb,d.buyer1State,d.buyer1Postcode].filter(Boolean).map(esc).join(", ");
+  const dep = money(d.initialDeposit) + (d.initialDepositDue?(" ("+esc(d.initialDepositDue).replace(/_/g," ")+")"):"") + (d.balanceDeposit?(" + balance "+money(d.balanceDeposit)+(d.balanceDepositDue?(" by "+esc(d.balanceDepositDue)):"")):"");
+  const sol = d.solicitorFirm ? esc(d.solicitorFirm)+(d.solicitorContact?(" · "+esc(d.solicitorContact)):"")+(d.solicitorPhone?(" · "+esc(d.solicitorPhone)):"")+(d.solicitorEmail?(" · "+esc(d.solicitorEmail)):"") : "";
 
   let body = `
-    <div class="muted small" style="margin-bottom:4px">${d.address} · Ref ${d.ref||""}</div>
-    <dl class="kv" style="grid-template-columns:170px 1fr">
-      <dt>Buyer 1</dt><dd>${d.buyer1Name} · ${d.buyer1Mobile} · ${d.buyer1Email}</dd>
-      ${d.buyer2Name?`<dt>Buyer 2</dt><dd>${d.buyer2Name} ${d.buyer2Email?("· "+d.buyer2Email):""}</dd>`:""}
-      <dt>Deposit</dt><dd>${fmt(d.deposit)}</dd>
-      <dt>Finance</dt><dd>${fin}</dd>
-      <dt>Building &amp; pest</dt><dd>${bp}</dd>
-      <dt>Settlement</dt><dd>${d.settlementDays||"?"} days from contract</dd>
-      ${d.solicitorFirm?`<dt>Solicitor</dt><dd>${d.solicitorFirm} ${d.solicitorPhone?("· "+d.solicitorPhone):""}</dd>`:""}
-      ${d.conditions?`<dt>Special conditions</dt><dd>${d.conditions}</dd>`:""}
+    <div class="muted small" style="margin-bottom:6px">${esc(d.address)} · Ref ${esc(d.ref)||""}</div>
+    <dl class="kv" style="grid-template-columns:190px 1fr">
+      ${row("Buyer 1", esc(d.buyer1Name)+" · "+esc(d.buyer1Mobile)+" · "+esc(d.buyer1Email))}
+      ${row("Buyer 1 address", buyer1Addr)}
+      ${d.buyer2Name?row("Buyer 2", esc(d.buyer2Name)+(d.buyer2Email?(" · "+esc(d.buyer2Email)):"")+(d.buyer2Mobile?(" · "+esc(d.buyer2Mobile)):"")):""}
+      ${row("Offer price", "<strong>"+money(d.offerPrice)+"</strong>")}
+      ${row("Offer date", esc(d.offerDate))}
+      ${row("Offer valid until", esc(d.offerExpiry))}
+      ${row("Deposit", dep)}
+      ${row("Finance", esc(finText(d)))}
+      ${row("Building &amp; pest", d.bp==="yes"?("Subject · by "+esc(d.bpDate||"TBC")):(d.bp==="no"?"Waived":"—"))}
+      ${row("Settlement", esc(settleText(d)))}
+      ${row("Solicitor", sol)}
+      ${row("Inclusions", esc(d.inclusions))}
+      ${row("Exclusions", esc(d.exclusions))}
+      ${row("Special conditions", esc(d.conditions))}
     </dl>`;
 
   if (editable){
     body += `
-      <div class="row" style="margin-top:6px">
-        <div class="field"><label>Offer price (you can adjust before pushing)</label>
-          <input id="editPrice" value="${d.offerPrice}"></div>
-        <div class="field"><label>Deposit</label><input id="editDeposit" value="${d.deposit}"></div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label>Offer price (adjust before pushing)</label><input id="editPrice" value="${esc(d.offerPrice)}"></div>
+        <div class="field"><label>Settlement date</label><input id="editSettle" type="date" value="${esc(d.settlementDate||"")}"></div>
       </div>
-      <div class="field"><label>Agent notes / amended conditions</label>
-        <textarea id="editConditions">${d.conditions||""}</textarea></div>
+      <div class="field"><label>Agent notes / amended conditions</label><textarea id="editConditions">${esc(d.conditions||"")}</textarea></div>
       <div class="btnrow">
         <button class="btn btn-ok" id="approveBtn">✓ Approve &amp; push to REX + Realworks</button>
         <button class="btn btn-bad" id="rejectBtn">Reject</button>
@@ -144,20 +138,20 @@ function openOffer(id){
     body += `
       <div class="result-box">
         <strong>Pushed to REX &amp; Realworks ✓</strong>
-        <dl class="kv" style="grid-template-columns:170px 1fr;margin-top:8px">
+        <dl class="kv" style="grid-template-columns:190px 1fr;margin-top:8px">
           <dt>REX contact</dt><dd>${i.rexContactId} ${i.rexContactNew?"(new)":"(existing)"}</dd>
           <dt>REX offer</dt><dd>${i.rexOfferId}</dd>
           <dt>Realworks form</dt><dd>${i.realworksFormId}</dd>
           <dt>Contract link</dt><dd><a href="${i.realworksUrl}" target="_blank" rel="noopener">Open contract (demo)</a></dd>
         </dl>
       </div>
-      <h2 style="margin-top:18px">Integration console</h2>
+      <h2 style="margin-top:20px">Integration console</h2>
       <div class="console">${i.log.map(consoleLine).join("")}</div>`;
   } else {
-    body += `<div class="result-box bad"><strong>Rejected.</strong> ${o.rejectReason||""}</div>`;
+    body += `<div class="result-box bad"><strong>Rejected.</strong> ${esc(o.rejectReason)||""}</div>`;
   }
 
-  $("#mTitle").textContent = `Offer ${o.id} · ${fmt(d.offerPrice)}`;
+  $("#mTitle").textContent = `Offer ${o.id} · ${money(d.offerPrice)}`;
   $("#mBody").innerHTML = body;
   $("#modalBg").classList.add("open");
 
@@ -168,40 +162,32 @@ function openOffer(id){
 }
 
 async function doApprove(id){
-  const price = $("#editPrice")?.value, dep = $("#editDeposit")?.value, cond = $("#editConditions")?.value;
-  // apply agent edits back onto the record before pushing
   const o = MockApi.getOffer(id);
+  const price = $("#editPrice") && $("#editPrice").value;
+  const settle = $("#editSettle") && $("#editSettle").value;
+  const cond = $("#editConditions") && $("#editConditions").value;
   if (price) o.data.offerPrice = price;
-  if (dep) o.data.deposit = dep;
+  if (settle) o.data.settlementDate = settle;
   if (cond!=null) o.data.conditions = cond;
-  MockApi.listOffers(); // no-op read
-  localStorage.setItem("offerToRex.offers.v1", JSON.stringify(
-    MockApi.listOffers().map(x=> x.id===id ? o : x)));
+  localStorage.setItem("offerToRex.offers.v1", JSON.stringify(MockApi.listOffers().map(x=> x.id===id ? o : x)));
 
   const btn = $("#approveBtn"); btn.disabled=true; btn.textContent="Pushing…";
   const live = $("#liveResult");
-  live.innerHTML = `<h2 style="margin-top:18px">Integration console</h2><div class="console" id="liveConsole"></div>`;
+  live.innerHTML = `<h2 style="margin-top:20px">Integration console</h2><div class="console" id="liveConsole"></div>`;
   const con = $("#liveConsole");
-
-  const res = await MockApi.approveOffer(id, "Emily Xiong", (entry)=>{
-    con.insertAdjacentHTML("beforeend", consoleLine(entry));
-    con.scrollTop = con.scrollHeight;
-  });
-
+  const res = await MockApi.approveOffer(id, "Emily Xiong", (entry)=>{ con.insertAdjacentHTML("beforeend", consoleLine(entry)); con.scrollTop = con.scrollHeight; });
   if (res.ok){
     const i=res.integration;
     live.insertAdjacentHTML("afterbegin", `
       <div class="result-box">
         <strong>Done ✓ — offer is now in REX and a Realworks contract is ready.</strong>
-        <dl class="kv" style="grid-template-columns:170px 1fr;margin-top:8px">
+        <dl class="kv" style="grid-template-columns:190px 1fr;margin-top:8px">
           <dt>REX contact</dt><dd>${i.rexContactId} ${i.rexContactNew?"(new)":"(existing)"}</dd>
           <dt>REX offer</dt><dd>${i.rexOfferId}</dd>
           <dt>Realworks form</dt><dd><a href="${i.realworksUrl}" target="_blank" rel="noopener">Open pre-filled contract (demo)</a></dd>
         </dl>
       </div>`);
-    btn.textContent="Approved ✓";
-    toast("Pushed to REX + Realworks");
-    render();
+    btn.textContent="Approved ✓"; toast("Pushed to REX + Realworks"); render();
   }
 }
 
@@ -209,42 +195,46 @@ async function doReject(id){
   const reason = prompt("Reason for rejecting this offer (optional):","");
   if (reason===null) return;
   await MockApi.rejectOffer(id, reason, "Emily Xiong");
-  $("#modalBg").classList.remove("open");
-  toast("Offer rejected");
-  render();
+  $("#modalBg").classList.remove("open"); toast("Offer rejected"); render();
 }
 
-/* sample offer seeding for quick demos — spread across both listings */
-const SAMPLE_BUYERS = {
-  "13253616": [
-    {buyer1Name:"Daniel Nguyen",buyer1Mobile:"0412 884 220",buyer1Email:"daniel.nguyen@email.com",
-     offerPrice:"915000",deposit:"45000",finance:"subject_to_finance",financeDays:"21",lender:"CommBank",
-     bpDays:"7",settlementDays:"30",conditions:"Keen to move quickly — flexible on settlement.",
-     solicitorFirm:"Sunnybank Conveyancing",solicitorPhone:"07 3344 9100"},
-    {buyer1Name:"Priya & Arjun Sharma",buyer1Mobile:"0438 110 776",buyer1Email:"sharma.family@email.com",
-     offerPrice:"902500",deposit:"50000",finance:"cash",settlementDays:"45",
-     conditions:"Cash buyers, no finance clause.",solicitorFirm:"Patel Legal"}
+/* sample offers — full detail, across Emily's listings */
+const SAMPLES = {
+  "13225493": [
+    {buyer1Name:"David & Linda Chen",buyer1Mobile:"0412 884 220",buyer1Email:"chen.family@email.com",
+     buyer1Street:"14 Mains Road",buyer1Suburb:"Sunnybank",buyer1State:"QLD",buyer1Postcode:"4109",
+     offerPrice:"2850000",offerDate:"2026-06-19",offerExpiry:"2026-06-26",
+     initialDeposit:"5000",initialDepositDue:"on_signing",balanceDeposit:"280000",balanceDepositDue:"2026-07-03",
+     finance:"subject_to_finance",lender:"CommBank",loanAmount:"2100000",financeDate:"2026-07-10",
+     bp:"yes",bpDate:"2026-06-30",settlementDate:"2026-08-14",
+     solicitorFirm:"Sunnybank Conveyancing",solicitorContact:"Grace Lim",solicitorPhone:"07 3344 9100",solicitorEmail:"grace@sbconvey.com.au",
+     inclusions:"All curtains, dishwasher, pool equipment",conditions:"Subject to satisfactory building & pest."}
   ],
-  "13243059": [
-    {buyer1Name:"Michael & Tina Brown",buyer1Mobile:"0401 552 318",buyer1Email:"brown.household@email.com",
-     offerPrice:"1285000",deposit:"64000",finance:"subject_to_finance",financeDays:"14",lender:"Westpac",
-     bpDays:"7",settlementDays:"30",conditions:"Pre-auction offer — would like to secure before 11 Jul.",
-     solicitorFirm:"Mansfield Legal Co",solicitorPhone:"07 3349 5500"},
-    {buyer1Name:"Wei Chen",buyer1Mobile:"0466 207 884",buyer1Email:"wei.chen@email.com",
-     offerPrice:"1250000",deposit:"75000",finance:"cash",settlementDays:"60",
-     conditions:"Cash, flexible settlement to suit vendor."}
+  "13215340": [
+    {buyer1Name:"Michael Brown",buyer1Mobile:"0401 552 318",buyer1Email:"m.brown@email.com",
+     buyer1Street:"8 Marsden Road",buyer1Suburb:"Browns Plains",buyer1State:"QLD",buyer1Postcode:"4118",
+     offerPrice:"915000",offerDate:"2026-06-19",offerExpiry:"2026-06-24",
+     initialDeposit:"5000",initialDepositDue:"on_signing",balanceDeposit:"40000",balanceDepositDue:"2026-07-01",
+     finance:"subject_to_finance",lender:"Westpac",loanAmount:"720000",financeDate:"2026-07-05",
+     bp:"yes",bpDate:"2026-06-27",settlementDate:"2026-07-31",
+     solicitorFirm:"Logan Legal Co",solicitorContact:"Sam Patel",solicitorPhone:"07 3299 4400",
+     inclusions:"Solar panels, garden shed",conditions:"Keen to move quickly — flexible on settlement."},
+    {buyer1Name:"Wei Zhang",buyer1Mobile:"0466 207 884",buyer1Email:"wei.zhang@email.com",
+     buyer1Street:"22 Grand Plaza Dr",buyer1Suburb:"Browns Plains",buyer1State:"QLD",buyer1Postcode:"4118",
+     offerPrice:"902500",offerDate:"2026-06-19",
+     initialDeposit:"45000",initialDepositDue:"on_signing",
+     finance:"cash",settlementDate:"2026-08-28",
+     solicitorFirm:"Patel Legal",conditions:"Cash buyer, no finance clause."}
   ]
 };
 let seedIdx = 0;
 function seed(){
   const ids = Object.keys(LISTINGS);
   const id = ids[seedIdx % ids.length]; seedIdx++;
-  const L = LISTINGS[id];
-  const pool = SAMPLE_BUYERS[id];
+  const L = LISTINGS[id]; const pool = SAMPLES[id] || SAMPLES["13215340"];
   const s = pool[Math.floor(Math.random()*pool.length)];
   MockApi.submitOffer(Object.assign({
-    listingId:L.listingId, ref:L.ref, address:L.address, agent:L.agent,
-    beds:L.beds, baths:L.baths, cars:L.cars
+    listingId:L.listingId, ref:L.ref, address:L.address, agent:L.agent, beds:L.beds, baths:L.baths, cars:L.cars
   }, s)).then(()=>{render();toast("Sample offer added · "+L.address.split(",")[0]);});
 }
 
@@ -254,7 +244,7 @@ $("#refreshBtn").addEventListener("click", render);
 $("#seedBtn").addEventListener("click", seed);
 $("#clearBtn").addEventListener("click", ()=>{ if(confirm("Clear all demo offers?")){MockApi.clearAll();render();}});
 
-window.onLangChange = render;          // re-render queue text when language changes
+window.onLangChange = render;
 initLang();
 $("#langToggle").addEventListener("click", toggleLang);
 render();

@@ -13,7 +13,7 @@
     <span class="chip">LJ</span>
     <span>HOOKER<small>PROPERTY PARTNERS</small></span>
   </div>
-  <button id="langToggle" class="role" style="cursor:pointer;border:1px solid #444">中文</button>
+  <button id="langToggle" class="role" style="cursor:pointer">中文</button>
   <span class="role" data-i18n="roleBuyer">Buyer offer form</span>
 </header>
 
@@ -37,51 +37,74 @@
     <fieldset>
       <legend data-i18n="buyer1">Buyer 1</legend>
       <div class="row">
-        <div class="field"><label><span data-i18n="fullName">Full name</span> <span class="req">*</span></label><input name="buyer1Name" required></div>
+        <div class="field"><label><span data-i18n="fullName">Full legal name</span> <span class="req">*</span></label><input name="buyer1Name" required></div>
         <div class="field"><label><span data-i18n="mobile">Mobile</span> <span class="req">*</span></label><input name="buyer1Mobile" inputmode="tel" required></div>
       </div>
+      <div class="field"><label><span data-i18n="email">Email</span> <span class="req">*</span></label><input type="email" name="buyer1Email" required></div>
+      <label class="grouplabel" data-i18n="resAddress">Residential address</label>
+      <div class="field"><input name="buyer1Street" data-i18n-ph="street" placeholder="Street address"></div>
       <div class="row">
-        <div class="field"><label><span data-i18n="email">Email</span> <span class="req">*</span></label><input type="email" name="buyer1Email" required></div>
-        <div class="field"><label data-i18n="postal">Postal address</label><input name="buyer1Postal"></div>
+        <div class="field" style="flex:2"><input name="buyer1Suburb" data-i18n-ph="suburb" placeholder="Suburb"></div>
+        <div class="field"><select name="buyer1State"><option value="">State</option><option>QLD</option><option>NSW</option><option>VIC</option><option>SA</option><option>WA</option><option>TAS</option><option>ACT</option><option>NT</option></select></div>
+        <div class="field"><input name="buyer1Postcode" inputmode="numeric" data-i18n-ph="postcode" placeholder="Postcode"></div>
       </div>
     </fieldset>
 
     <fieldset>
       <legend data-i18n="buyer2">Buyer 2 (optional)</legend>
       <div class="row">
-        <div class="field"><label data-i18n="fullName">Full name</label><input name="buyer2Name"></div>
-        <div class="field"><label data-i18n="email">Email</label><input type="email" name="buyer2Email"></div>
+        <div class="field"><label data-i18n="fullName">Full legal name</label><input name="buyer2Name"></div>
+        <div class="field"><label data-i18n="mobile">Mobile</label><input name="buyer2Mobile" inputmode="tel"></div>
+      </div>
+      <div class="field"><label data-i18n="email">Email</label><input type="email" name="buyer2Email"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend data-i18n="offerTerms">Offer &amp; price</legend>
+      <div class="row">
+        <div class="field"><label><span data-i18n="offerPrice">Offer / purchase price (AUD)</span> <span class="req">*</span></label><input name="offerPrice" inputmode="numeric" placeholder="e.g. 1450000" required></div>
+        <div class="field"><label><span data-i18n="offerDate">Offer date</span> <span class="req">*</span></label><input type="date" name="offerDate" required></div>
+        <div class="field"><label data-i18n="offerExpiry">Offer valid until</label><input type="date" name="offerExpiry"></div>
       </div>
     </fieldset>
 
     <fieldset>
-      <legend data-i18n="offerTerms">Offer terms</legend>
+      <legend data-i18n="depositSection">Deposit</legend>
       <div class="row">
-        <div class="field">
-          <label><span data-i18n="offerPrice">Offer price (AUD)</span> <span class="req">*</span></label>
-          <input name="offerPrice" inputmode="numeric" placeholder="e.g. 915000" required>
-        </div>
-        <div class="field">
-          <label><span data-i18n="deposit">Deposit (AUD)</span> <span class="req">*</span></label>
-          <input name="deposit" inputmode="numeric" placeholder="e.g. 45000" required>
-        </div>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label><span data-i18n="finance">Finance</span> <span class="req">*</span></label>
-          <select name="finance" id="finance" required>
-            <option value="" data-i18n="choose">Choose…</option>
-            <option value="cash" data-i18n="cash">Cash / not subject to finance</option>
-            <option value="subject_to_finance" data-i18n="subjectFinance">Subject to finance</option>
+        <div class="field"><label><span data-i18n="initialDeposit">Initial deposit (AUD)</span> <span class="req">*</span></label><input name="initialDeposit" inputmode="numeric" placeholder="e.g. 5000" required></div>
+        <div class="field"><label data-i18n="initialDepositDue">Initial deposit due</label>
+          <select name="initialDepositDue">
+            <option value="on_signing" data-i18n="dueOnSigning">On contract signing</option>
+            <option value="on_finance" data-i18n="dueOnFinance">On finance approval</option>
+            <option value="on_uncond" data-i18n="dueOnUncond">When unconditional</option>
           </select>
         </div>
-        <div class="field" id="lenderWrap" style="display:none">
-          <label data-i18n="lender">Lender</label><input name="lender" placeholder="e.g. CommBank">
-        </div>
-        <div class="field" id="financeDaysWrap" style="display:none">
-          <label data-i18n="financeDays">Finance approval (days)</label><input name="financeDays" inputmode="numeric" placeholder="e.g. 21">
-        </div>
       </div>
+      <div class="row">
+        <div class="field"><label data-i18n="balanceDeposit">Balance deposit (AUD, optional)</label><input name="balanceDeposit" inputmode="numeric" placeholder="e.g. 140000"></div>
+        <div class="field"><label data-i18n="balanceDepositDue">Balance deposit due (optional)</label><input type="date" name="balanceDepositDue"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend data-i18n="finance">Finance</legend>
+      <div class="field">
+        <label><span data-i18n="finance">Finance</span> <span class="req">*</span></label>
+        <select name="finance" id="finance" required>
+          <option value="" data-i18n="choose">Choose…</option>
+          <option value="cash" data-i18n="cash">Cash / not subject to finance</option>
+          <option value="subject_to_finance" data-i18n="subjectFinance">Subject to finance</option>
+        </select>
+      </div>
+      <div class="row" id="financeWrap" style="display:none">
+        <div class="field"><label data-i18n="lender">Lender</label><input name="lender" placeholder="e.g. CommBank"></div>
+        <div class="field"><label data-i18n="loanAmount">Loan amount (AUD)</label><input name="loanAmount" inputmode="numeric" placeholder="e.g. 1100000"></div>
+        <div class="field"><label data-i18n="financeDate">Finance approval by</label><input type="date" name="financeDate"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend data-i18n="bp">Building &amp; pest</legend>
       <div class="row">
         <div class="field">
           <label data-i18n="bp">Building &amp; pest</label>
@@ -91,25 +114,36 @@
             <option value="no" data-i18n="bpWaived">Waived</option>
           </select>
         </div>
-        <div class="field" id="bpDaysWrap" style="display:none">
-          <label data-i18n="bpDays">B&amp;P inspection (days)</label><input name="bpDays" inputmode="numeric" placeholder="e.g. 7">
-        </div>
-        <div class="field">
-          <label><span data-i18n="settlement">Settlement (days from contract)</span> <span class="req">*</span></label>
-          <input name="settlementDays" inputmode="numeric" placeholder="e.g. 30" required>
-        </div>
-      </div>
-      <div class="field">
-        <label data-i18n="conditions">Special conditions (optional)</label>
-        <textarea name="conditions" data-i18n-ph="conditionsPh" placeholder="e.g. subject to sale of buyer's existing property at 12 Smith St…"></textarea>
+        <div class="field" id="bpWrap" style="display:none"><label data-i18n="bpDate">Inspection completed by</label><input type="date" name="bpDate"></div>
       </div>
     </fieldset>
 
     <fieldset>
-      <legend data-i18n="solicitor">Your solicitor / conveyancer (optional)</legend>
+      <legend data-i18n="settlementSection">Settlement</legend>
+      <div class="row">
+        <div class="field"><label><span data-i18n="settlementDate">Settlement date</span> <span class="req">*</span></label><input type="date" name="settlementDate" required></div>
+        <div class="field"><label data-i18n="settlementDays">…or settlement period (days)</label><input name="settlementDays" inputmode="numeric" placeholder="e.g. 30"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend data-i18n="solicitor">Buyer's solicitor / conveyancer (optional)</legend>
       <div class="row">
         <div class="field"><label data-i18n="firm">Firm</label><input name="solicitorFirm"></div>
-        <div class="field"><label data-i18n="contactPhone">Contact phone</label><input name="solicitorPhone" inputmode="tel"></div>
+        <div class="field"><label data-i18n="contactName">Contact name</label><input name="solicitorContact"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label data-i18n="email">Email</label><input type="email" name="solicitorEmail"></div>
+        <div class="field"><label data-i18n="contactPhone">Phone</label><input name="solicitorPhone" inputmode="tel"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend data-i18n="conditionsSection">Conditions &amp; inclusions</legend>
+      <div class="field"><label data-i18n="conditions">Special conditions (optional)</label><textarea name="conditions" data-i18n-ph="conditionsPh" placeholder="e.g. subject to sale of buyer's property…"></textarea></div>
+      <div class="row">
+        <div class="field"><label data-i18n="inclusions">Inclusions (optional)</label><textarea name="inclusions" data-i18n-ph="inclusionsPh" placeholder="e.g. dishwasher, curtains…"></textarea></div>
+        <div class="field"><label data-i18n="exclusions">Exclusions (optional)</label><textarea name="exclusions" data-i18n-ph="exclusionsPh" placeholder="e.g. wall brackets…"></textarea></div>
       </div>
     </fieldset>
 
@@ -146,48 +180,49 @@ initLang();
 paintProperty();
 document.getElementById("langToggle").addEventListener("click", toggleLang);
 
+// default the offer date to today
+(function(){ var d=new Date(); var iso=d.toISOString().slice(0,10); var f=document.querySelector("input[name=offerDate]"); if(f && !f.value) f.value=iso; })();
+
 const fin = document.getElementById("finance");
 fin.addEventListener("change", function(){
-  const on = fin.value === "subject_to_finance";
-  document.getElementById("lenderWrap").style.display = on ? "" : "none";
-  document.getElementById("financeDaysWrap").style.display = on ? "" : "none";
+  document.getElementById("financeWrap").style.display = (fin.value === "subject_to_finance") ? "" : "none";
 });
 const bp = document.getElementById("bp");
 bp.addEventListener("change", function(){
-  document.getElementById("bpDaysWrap").style.display = bp.value === "yes" ? "" : "none";
+  document.getElementById("bpWrap").style.display = (bp.value === "yes") ? "" : "none";
 });
 
-function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},2600);}
+function toast(msg){var el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},2600);}
 
 document.getElementById("offerForm").addEventListener("submit", async function(e){
   e.preventDefault();
-  const f = e.target;
-  const err = document.getElementById("err"); err.textContent="";
+  var f = e.target;
+  var err = document.getElementById("err"); err.textContent="";
   if (!f.checkValidity() || !document.getElementById("consent").checked){
     err.textContent = t("errRequired");
     f.reportValidity(); return;
   }
-  const d = Object.fromEntries(new FormData(f).entries());
-  const payload = Object.assign({
+  var d = Object.fromEntries(new FormData(f).entries());
+  var payload = Object.assign({
     listingId:P.listingId, ref:P.ref, address:P.address, agent:P.agent,
     beds:P.beds, baths:P.baths, cars:P.cars
   }, d);
 
-  const btn = document.getElementById("submitBtn");
+  var btn = document.getElementById("submitBtn");
   btn.disabled = true; btn.textContent = t("submitting");
-  const res = await MockApi.submitOffer(payload);
+  var res = await MockApi.submitOffer(payload);
   btn.disabled = false; btn.textContent = t("submit");
 
   if (res.ok){
-    const price = "$" + Number(payload.offerPrice).toLocaleString();
-    const thanks = t("thanks").replace("{name}", payload.buyer1Name.split(" ")[0]);
-    const body = t("receivedBody").replace("{price}", "<strong>"+price+"</strong>").replace("{address}", P.address);
-    const ref = t("refNote").replace("{id}", "<code class='inline'>"+res.offerId+"</code>");
+    var price = "$" + Number(payload.offerPrice).toLocaleString();
+    var thanks = t("thanks").replace("{name}", payload.buyer1Name.split(" ")[0]);
+    var body = t("receivedBody").replace("{price}", "<strong>"+price+"</strong>").replace("{address}", P.address);
+    var refLine = t("refNote").replace("{id}", "<code class='inline'>"+res.offerId+"</code>");
     f.innerHTML =
       "<h2>" + t("received") + "</h2>" +
       "<div class='result-box'>" +
         "<p style='margin:0 0 8px'><strong>" + thanks + "</strong> " + body + "</p>" +
-        "<p class='small muted' style='margin:0'>" + ref + "</p>" +
+        "<p class='small muted' style='margin:0'>" + refLine + "</p>" +
       "</div>";
     window.scrollTo({top:0,behavior:"smooth"});
   } else {
