@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offer approvals · Emily Xiong · LJ Hooker Property Partners</title>
+<style>
+/* Offer-to-REX demo — shared styles (LJ Hooker Property Partners) */
+:root{
+  --ljh-yellow:#ffe512;
+  --ljh-yellow-d:#f5c400;
+  --ink:#1a1a1a;
+  --charcoal:#2b2b2b;
+  --grey:#6b6b6b;
+  --line:#e6e6e6;
+  --bg:#f4f5f7;
+  --card:#ffffff;
+  --ok:#1f9d55;
+  --bad:#d64545;
+  --info:#2563eb;
+  --radius:14px;
+  --shadow:0 2px 10px rgba(0,0,0,.06),0 8px 28px rgba(0,0,0,.05);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.5}
+a{color:var(--info)}
+
+/* header */
+.topbar{background:var(--ink);color:#fff;display:flex;align-items:center;gap:14px;
+  padding:12px 20px;position:sticky;top:0;z-index:20}
+.brandmark{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
+.brandmark .chip{background:var(--ljh-yellow);color:#000;border-radius:6px;
+  padding:4px 8px;font-size:13px;font-weight:900}
+.brandmark small{display:block;font-weight:500;color:#cfcfcf;font-size:11px;letter-spacing:.4px}
+.topbar .role{margin-left:auto;font-size:12px;background:#000;border:1px solid #444;
+  padding:5px 10px;border-radius:999px;color:#ffe512}
+.demobanner{background:repeating-linear-gradient(45deg,#fff6c2,#fff6c2 12px,#ffefa0 12px,#ffefa0 24px);
+  color:#5b4a00;font-size:12.5px;text-align:center;padding:6px 12px;font-weight:600;border-bottom:1px solid #f0e08a}
+
+/* layout */
+.wrap{max-width:860px;margin:0 auto;padding:22px 18px 80px}
+.wrap.wide{max-width:1100px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+h1{font-size:24px;margin:.2em 0 .1em}
+h2{font-size:17px;margin:0 0 14px;border-bottom:2px solid var(--ljh-yellow);
+  display:inline-block;padding-bottom:4px}
+.muted{color:var(--grey)}
+.small{font-size:13px}
+
+/* property hero */
+.hero{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.hero img{width:230px;height:150px;object-fit:cover;border-radius:10px;flex:0 0 auto;background:#ddd}
+.hero .meta{flex:1;min-width:220px}
+.hero .addr{font-size:19px;font-weight:800}
+.facts{display:flex;gap:16px;margin-top:8px;color:var(--charcoal);font-weight:600;font-size:14px;flex-wrap:wrap}
+.facts span{display:inline-flex;gap:5px;align-items:center}
+.pill{display:inline-block;background:var(--ljh-yellow);color:#000;font-weight:800;
+  border-radius:999px;padding:4px 12px;font-size:12px;margin-top:8px}
+
+/* form */
+.field{margin-bottom:14px}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:5px}
+label .req{color:var(--bad)}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #cfd4da;border-radius:9px;
+  font-size:15px;font-family:inherit;background:#fff}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ljh-yellow-d);
+  box-shadow:0 0 0 3px rgba(255,229,18,.35)}
+textarea{min-height:84px;resize:vertical}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.row > .field{flex:1;min-width:160px}
+.help{font-size:12px;color:var(--grey);margin-top:4px}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:14px 16px 4px;margin:0 0 18px}
+legend{font-weight:700;font-size:14px;padding:0 6px;color:var(--charcoal)}
+.check{display:flex;gap:10px;align-items:flex-start}
+.check input{width:auto;margin-top:3px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  border:none;border-radius:10px;padding:13px 20px;font-size:15px;font-weight:800;font-family:inherit}
+.btn-primary{background:var(--ljh-yellow);color:#000}
+.btn-primary:hover{background:var(--ljh-yellow-d)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-bad{background:#fff;color:var(--bad);border:1px solid var(--bad)}
+.btn-ghost{background:#fff;color:var(--ink);border:1px solid #cfd4da}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+
+/* agent queue */
+.queue{display:grid;gap:14px}
+.offer-card{border:1px solid var(--line);border-left:5px solid var(--ljh-yellow);
+  border-radius:12px;padding:16px;background:#fff;cursor:pointer;transition:.15s}
+.offer-card:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.offer-card .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.offer-card .price{font-size:20px;font-weight:900}
+.badge{font-size:11px;font-weight:800;border-radius:999px;padding:3px 10px;text-transform:uppercase;letter-spacing:.4px}
+.badge.pending{background:#fff3cd;color:#8a6d00}
+.badge.approved{background:#dff3e6;color:var(--ok)}
+.badge.rejected{background:#fae0e0;color:var(--bad)}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:6px 14px;font-size:14px;margin-top:6px}
+.kv dt{color:var(--grey)}
+.kv dd{margin:0;font-weight:600}
+.empty{text-align:center;color:var(--grey);padding:40px 10px}
+
+/* integration console */
+.console{background:#0d1117;color:#d6deeb;border-radius:12px;padding:14px;font-family:var(--mono);
+  font-size:12.5px;max-height:420px;overflow:auto}
+.console .line{padding:8px 10px;border-radius:8px;margin-bottom:8px;background:#161b22;border-left:3px solid #30363d}
+.console .line.REX{border-left-color:#f0a500}
+.console .line.Realworks{border-left-color:#4ea1ff}
+.console .tag{font-weight:800;font-size:11px;letter-spacing:.5px}
+.console .tag.REX{color:#f0a500}
+.console .tag.Realworks{color:#4ea1ff}
+.console pre{margin:6px 0 0;white-space:pre-wrap;word-break:break-word;color:#9fb3c8}
+.console .ttl{color:#fff}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-start;
+  justify-content:center;padding:30px 14px;z-index:50;overflow:auto}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:760px;width:100%;padding:0;overflow:hidden}
+.modal .mhead{background:var(--ink);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.modal .mbody{padding:20px}
+.modal .x{cursor:pointer;font-size:22px;line-height:1;color:#fff;background:none;border:none}
+.result-box{background:#f0fbf4;border:1px solid #bfe6cc;border-radius:12px;padding:16px;margin-top:8px}
+.result-box.bad{background:#fdf1f1;border-color:#f0c4c4}
+.result-box a{font-weight:700}
+
+/* qr / launcher */
+.steps{counter-reset:s;display:grid;gap:12px}
+.steps li{list-style:none;display:flex;gap:12px;align-items:flex-start}
+.steps li::before{counter-increment:s;content:counter(s);background:var(--ink);color:var(--ljh-yellow);
+  font-weight:800;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:13px}
+.launchgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.launchgrid{grid-template-columns:1fr}}
+.qrbox{text-align:center}
+.qrbox canvas,.qrbox img{background:#fff;padding:12px;border-radius:12px;border:1px solid var(--line)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+  padding:12px 18px;border-radius:10px;font-weight:600;box-shadow:var(--shadow);display:none;z-index:60}
+.toast.show{display:block}
+code.inline{background:#eef0f3;padding:2px 6px;border-radius:5px;font-family:var(--mono);font-size:12.5px}
+
+</style>
+</head>
+<body>
+<div class="demobanner" data-i18n="demoAgent">DEMO ENVIRONMENT · REX &amp; Realworks calls are simulated · watch the Integration Console when you approve</div>
+<header class="topbar">
+  <div class="brandmark">
+    <span class="chip">LJ</span>
+    <span>HOOKER<small>PROPERTY PARTNERS</small></span>
+  </div>
+  <button id="langToggle" class="role" style="cursor:pointer;border:1px solid #444">中文</button>
+  <span class="role" data-i18n="roleAgent">Agent · Emily Xiong</span>
+</header>
+
+<div class="wrap wide">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <h1 style="margin:6px 0" data-i18n="approvals">Offer approvals</h1>
+    <div class="btnrow" style="margin:0">
+      <button class="btn btn-ghost" id="refreshBtn" data-i18n="refresh">↻ Refresh</button>
+      <button class="btn btn-ghost" id="seedBtn" data-i18n="addSample">+ Add sample offer</button>
+      <button class="btn btn-ghost" id="clearBtn" data-i18n="clearData">Clear demo data</button>
+    </div>
+  </div>
+  <p class="muted small" data-i18n="agentIntro">Buyers submit via the QR form. Each offer waits here for your confirmation. Approving pushes it to REX (contact + offer) and generates a pre-filled Realworks contract.</p>
+
+  <div class="card">
+    <h2><span data-i18n="pending">Pending</span> <span class="muted small" id="pendCount"></span></h2>
+    <div class="queue" id="pending"></div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="decided">Decided</h2>
+    <div class="queue" id="decided"></div>
+  </div>
+</div>
+
+<!-- review modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="mhead">
+      <strong id="mTitle">Review offer</strong>
+      <button class="x" id="mClose">×</button>
+    </div>
+    <div class="mbody" id="mBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* Bilingual support: English + Simplified Chinese (中文).
+   Apply with data-i18n="key" (textContent) and data-i18n-ph="key" (placeholder).
+   JS-built strings use t(key). Language is read from ?lang=, else saved choice, else 'en'. */
+(function (g) {
+  "use strict";
+
+  const STR = {
+    en: {
+      // shared chrome
+      demoBuyer: "DEMO ENVIRONMENT · sample data only · no live contract is created",
+      demoAgent: "DEMO ENVIRONMENT · REX & Realworks calls are simulated · watch the Integration Console when you approve",
+      roleBuyer: "Buyer offer form",
+      roleAgent: "Agent · Emily Xiong",
+      // offer form
+      pill: "Submit your offer online",
+      listingAgent: "Listing agent:",
+      ref: "Ref",
+      uBed: "bed", uBath: "bath", uCar: "car",
+      yourOffer: "Your offer",
+      intro: "Complete the details below. Your agent reviews and confirms everything before it goes any further — nothing is binding until a contract is signed.",
+      buyer1: "Buyer 1",
+      fullName: "Full name",
+      mobile: "Mobile",
+      email: "Email",
+      postal: "Postal address",
+      buyer2: "Buyer 2 (optional)",
+      offerTerms: "Offer terms",
+      offerPrice: "Offer price (AUD)",
+      deposit: "Deposit (AUD)",
+      finance: "Finance",
+      choose: "Choose…",
+      cash: "Cash / not subject to finance",
+      subjectFinance: "Subject to finance",
+      lender: "Lender",
+      financeDays: "Finance approval (days)",
+      bp: "Building & pest",
+      bpSubject: "Subject to building & pest",
+      bpWaived: "Waived",
+      bpDays: "B&P inspection (days)",
+      settlement: "Settlement (days from contract)",
+      conditions: "Special conditions (optional)",
+      conditionsPh: "e.g. subject to sale of buyer's existing property at 12 Smith St…",
+      solicitor: "Your solicitor / conveyancer (optional)",
+      firm: "Firm",
+      contactPhone: "Contact phone",
+      consent: "I confirm these details are correct and consent to LJ Hooker Property Partners contacting me about this offer.",
+      submit: "Submit offer to agent →",
+      submitting: "Submitting…",
+      errRequired: "Please complete all required (*) fields and tick the consent box.",
+      errGeneric: "Something went wrong — please try again.",
+      received: "Offer received ✓",
+      thanks: "Thanks {name}!",
+      receivedBody: "Your offer of {price} on {address} has been sent to the listing agent.",
+      refNote: "Reference {id}. The agent will review and be in touch. Nothing is binding until a contract is signed.",
+      // agent page
+      approvals: "Offer approvals",
+      agentIntro: "Buyers submit via the QR form. Each offer waits here for your confirmation. Approving pushes it to REX (contact + offer) and generates a pre-filled Realworks contract.",
+      refresh: "↻ Refresh",
+      addSample: "+ Add sample offer",
+      clearData: "Clear demo data",
+      pending: "Pending",
+      decided: "Decided",
+      emptyPending: "No offers waiting. Open the buyer form (or scan the QR) to submit one, or click “Add sample offer”.",
+      emptyDecided: "Approved & rejected offers appear here."
+    },
+    zh: {
+      demoBuyer: "演示环境 · 仅为示例数据 · 不会生成正式合同",
+      demoAgent: "演示环境 · REX 与 Realworks 调用为模拟 · 审批时请留意集成控制台",
+      roleBuyer: "买家报价表",
+      roleAgent: "中介 · Emily Xiong",
+      pill: "在线提交您的报价",
+      listingAgent: "挂牌中介：",
+      ref: "编号",
+      uBed: "卧", uBath: "卫", uCar: "车位",
+      yourOffer: "您的报价",
+      intro: "请填写以下信息。您的中介会先审核并确认所有内容 —— 在正式签署合同之前，一切均不具约束力。",
+      buyer1: "买家一",
+      fullName: "全名",
+      mobile: "手机号码",
+      email: "电子邮箱",
+      postal: "通讯地址",
+      buyer2: "买家二（可选）",
+      offerTerms: "报价条款",
+      offerPrice: "报价金额（澳元）",
+      deposit: "定金（澳元）",
+      finance: "贷款情况",
+      choose: "请选择…",
+      cash: "现金 / 无需贷款",
+      subjectFinance: "需以贷款为条件",
+      lender: "贷款银行",
+      financeDays: "贷款批准期（天）",
+      bp: "建筑与虫害检查",
+      bpSubject: "需以建筑与虫害检查为条件",
+      bpWaived: "放弃检查",
+      bpDays: "检查期（天）",
+      settlement: "交割期（自合同起天数）",
+      conditions: "特别条款（可选）",
+      conditionsPh: "例如：以买家位于 12 Smith St 的现有房产售出为条件……",
+      solicitor: "您的律师 / 过户师（可选）",
+      firm: "事务所名称",
+      contactPhone: "联系电话",
+      consent: "我确认以上信息准确无误，并同意 LJ Hooker Property Partners 就此报价与我联系。",
+      submit: "提交报价给中介 →",
+      submitting: "提交中…",
+      errRequired: "请填写所有必填（*）项并勾选同意框。",
+      errGeneric: "出了点问题 —— 请重试。",
+      received: "报价已收到 ✓",
+      thanks: "谢谢您，{name}！",
+      receivedBody: "您对 {address} 的报价 {price} 已发送给挂牌中介。",
+      refNote: "参考编号 {id}。中介会进行审核并与您联系。在正式签署合同之前，一切均不具约束力。",
+      approvals: "报价审批",
+      agentIntro: "买家通过二维码表单提交报价。每条报价都会在此等待您的确认。批准后会推送至 REX（联系人 + 报价）并生成预填的 Realworks 合同。",
+      refresh: "↻ 刷新",
+      addSample: "+ 添加示例报价",
+      clearData: "清除演示数据",
+      pending: "待处理",
+      decided: "已处理",
+      emptyPending: "暂无待处理报价。打开买家表单（或扫描二维码）提交一条，或点击“添加示例报价”。",
+      emptyDecided: "已批准和已拒绝的报价会显示在这里。"
+    }
+  };
+
+  const KEY = "offerToRex.lang";
+  let cur = "en";
+
+  function t(key, lang) { const L = STR[lang || cur] || STR.en; return (key in L) ? L[key] : (STR.en[key] ?? key); }
+
+  function apply(lang) {
+    cur = STR[lang] ? lang : "en";
+    document.documentElement.setAttribute("lang", cur === "zh" ? "zh-CN" : "en");
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
+    // toggle button label shows the OTHER language
+    const tog = document.getElementById("langToggle");
+    if (tog) tog.textContent = cur === "en" ? "中文" : "EN";
+  }
+
+  function setLang(lang) { try { localStorage.setItem(KEY, lang); } catch (e) {} apply(lang); if (g.onLangChange) g.onLangChange(cur); }
+  function toggle() { setLang(cur === "en" ? "zh" : "en"); }
+
+  function init() {
+    const qp = new URLSearchParams(location.search).get("lang");
+    let saved = null; try { saved = localStorage.getItem(KEY); } catch (e) {}
+    apply(qp || saved || "en");
+  }
+
+  g.I18N = STR;
+  g.t = t;
+  g.applyTranslations = apply;
+  g.setLang = setLang;
+  g.toggleLang = toggle;
+  g.initLang = init;
+  g.currentLang = () => cur;
+})(window);
+
+</script>
+<script>
+/* Shared listing catalog (real current LJ Hooker Property Partners listings).
+   Used by index.html (QR per listing), offer.html (prefill) and agent.html (seeding).
+   A real QR only needs ?listingId=<id> — the property is resolved from here. */
+(function (g) {
+  "use strict";
+  const LISTINGS = {
+    "13253616": {
+      listingId: "13253616",
+      ref: "LJHPP-13253616",
+      address: "120 West Sentinel Drive, Greenbank QLD 4124",
+      beds: "4", baths: "2", cars: "2", land: "350m²",
+      agent: "Mayank Patel · LJ Hooker Property Partners | Sunnybank Hills",
+      img: "https://www.homely.com.au/img-variant/l-Rex-13253616-1.jpg?named-transform=webHeroTransform&version=AFruA3pU5KiElo8xXRjuZ488qbCGpYd."
+    },
+    "13243059": {
+      listingId: "13243059",
+      ref: "LJHPP-13243059",
+      address: "9 Maibry Street, Wishart QLD 4122",
+      beds: "4", baths: "2", cars: "2", land: "750m²",
+      agent: "Kosma Comino · LJ Hooker Property Partners | Sunnybank Hills",
+      img: "https://www.homely.com.au/img-variant/l-Rex-13243059-1.jpg?named-transform=webHeroTransform&version=AzKuSx7pyzkbUm3JA4DJV_9Tm.hxnH2_"
+    }
+  };
+  const DEFAULT_ID = "13253616";
+
+  // resolve a listing from URL params: ?listingId wins; any explicit field overrides
+  function resolve(search) {
+    const qp = new URLSearchParams(search || "");
+    const id = qp.get("listingId");
+    const base = (id && LISTINGS[id]) ? LISTINGS[id] : LISTINGS[DEFAULT_ID];
+    const out = Object.assign({}, base);
+    ["listingId","ref","address","beds","baths","cars","land","agent","img"].forEach(k => {
+      if (qp.get(k)) out[k] = qp.get(k);
+    });
+    return out;
+  }
+
+  g.LISTINGS = LISTINGS;
+  g.LISTINGS_DEFAULT_ID = DEFAULT_ID;
+  g.resolveListing = resolve;
+})(window);
+
+</script>
+<script>
+/* =====================================================================
+   Offer-to-REX demo  ·  DUMMY API LAYER
+   ---------------------------------------------------------------------
+   This file simulates the two back-end systems the production flow will
+   talk to:  REX CRM  and  Realworks (REI Forms Live).
+
+   NOTHING here calls a real server. Data is held in the browser
+   (localStorage) so the buyer form and the agent screen can share state
+   on the same machine for a walkthrough demo.
+
+   >>> SWAP-IN POINT FOR REAL APIS <<<
+   When the real API keys arrive, replace the bodies of:
+        MockApi._rexFindOrCreateContact()
+        MockApi._rexCreateOffer()
+        MockApi._realworksCreateContract()
+   with real fetch() calls to the endpoints in DUMMY_API.endpoints.
+   The rest of the app does not change.
+   ===================================================================== */
+
+(function (global) {
+  "use strict";
+
+  /* ---- Config: where the real calls will go (placeholders for now) ---- */
+  const DUMMY_API = {
+    rex: {
+      baseUrl: "https://api.rexsoftware.com/v1",         // TODO: confirm region/host with REX
+      token:   "REX_API_TOKEN_GOES_HERE",                 // TODO: paste real token
+      endpoints: {
+        findContact:  "/Contacts/search",
+        createContact:"/Contacts/create",
+        createOffer:  "/Listings/{listingId}/offers/create"
+      }
+    },
+    realworks: {
+      baseUrl: "https://api.formslive.com.au/v1",          // TODO: confirm with Forms Live
+      apiKey:  "REALWORKS_API_KEY_GOES_HERE",              // TODO: paste real key
+      userToken: "REALWORKS_USER_TOKEN_GOES_HERE",         // TODO: per-agent token
+      endpoints: {
+        createForm: "/forms",                              // create + populate a form
+        formTemplate: "QLD_CONTRACT_OF_SALE"               // template id to use
+      }
+    },
+    /* set to false once you wire real fetch() calls */
+    simulated: true,
+    latencyMs: 650
+  };
+
+  const STORE_KEY = "offerToRex.offers.v1";
+  const LOG_KEY   = "offerToRex.lastIntegrationLog.v1";
+
+  /* ----------------------------- helpers ----------------------------- */
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const now   = () => new Date().toISOString();
+  const uid   = (p) => p + "-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  function read() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function write(list) { localStorage.setItem(STORE_KEY, JSON.stringify(list)); }
+
+  /* ============================ Mock API ============================ */
+  const MockApi = {
+
+    config: DUMMY_API,
+
+    /* --- 1. BUYER submits an offer (public form). Held for approval. --- */
+    async submitOffer(payload) {
+      const list = read();
+      const record = {
+        id: uid("OFR"),
+        status: "pending",                // pending -> approved | rejected
+        submittedAt: now(),
+        decidedAt: null,
+        decidedBy: null,
+        rejectReason: null,
+        integration: null,                // filled on approval
+        data: payload
+      };
+      list.unshift(record);
+      write(list);
+      await sleep(300);
+      return { ok: true, offerId: record.id };
+    },
+
+    listOffers(status) {
+      const list = read();
+      return status ? list.filter((o) => o.status === status) : list;
+    },
+
+    getOffer(id) { return read().find((o) => o.id === id) || null; },
+
+    async rejectOffer(id, reason, agent) {
+      const list = read();
+      const o = list.find((x) => x.id === id);
+      if (!o) return { ok: false, error: "not found" };
+      o.status = "rejected";
+      o.rejectReason = reason || "";
+      o.decidedAt = now();
+      o.decidedBy = agent || "Agent";
+      write(list);
+      return { ok: true };
+    },
+
+    /* --- 2. AGENT approves -> push to REX, then create Realworks form --- */
+    async approveOffer(id, agent, onStep) {
+      const list = read();
+      const o = list.find((x) => x.id === id);
+      if (!o) return { ok: false, error: "not found" };
+
+      const log = [];
+      const step = (entry) => { log.push(entry); if (onStep) onStep(entry); };
+
+      // Step A: find or create the buyer contact in REX
+      const contact = await this._rexFindOrCreateContact(o.data, step);
+      // Step B: create the offer record under the listing in REX
+      const rexOffer = await this._rexCreateOffer(o.data, contact, step);
+      // Step C: generate the pre-filled Realworks contract
+      const contract = await this._realworksCreateContract(o.data, contact, step);
+
+      o.status = "approved";
+      o.decidedAt = now();
+      o.decidedBy = agent || "Agent";
+      o.integration = {
+        rexContactId: contact.id,
+        rexContactNew: contact._created,
+        rexOfferId: rexOffer.id,
+        realworksFormId: contract.formId,
+        realworksUrl: contract.url,
+        log
+      };
+      write(list);
+      localStorage.setItem(LOG_KEY, JSON.stringify(log));
+      return { ok: true, integration: o.integration };
+    },
+
+    getLastLog() {
+      try { return JSON.parse(localStorage.getItem(LOG_KEY)) || []; }
+      catch (e) { return []; }
+    },
+
+    clearAll() { localStorage.removeItem(STORE_KEY); localStorage.removeItem(LOG_KEY); },
+
+    /* ===================================================================
+       The three calls below are the SWAP-IN POINTS.
+       Each returns a fake response and records the request/response so the
+       Integration Console can display exactly what production will send.
+       =================================================================== */
+
+    async _rexFindOrCreateContact(d, step) {
+      const c = DUMMY_API.rex;
+
+      // (a) search for an existing contact by email
+      const searchReq = {
+        method: "POST",
+        url: c.baseUrl + c.endpoints.findContact,
+        headers: { Authorization: "Bearer " + c.token, "Content-Type": "application/json" },
+        body: { criteria: [{ name: "email_address", value: d.buyer1Email }] }
+      };
+      step({ system: "REX", title: "Search for existing buyer contact", request: searchReq });
+      await sleep(DUMMY_API.latencyMs);
+      const found = false; // demo: pretend no match -> we create one
+      step({ system: "REX", title: "Search response", response: { result: { rows: [], total: 0 } } });
+
+      if (found) {
+        return { id: "CONT-EXISTING", _created: false };
+      }
+
+      // (b) create a new contact
+      const createReq = {
+        method: "POST",
+        url: c.baseUrl + c.endpoints.createContact,
+        headers: { Authorization: "Bearer " + c.token, "Content-Type": "application/json" },
+        body: {
+          data: {
+            name: d.buyer1Name,
+            email_address: d.buyer1Email,
+            phone_number: d.buyer1Mobile,
+            type: "buyer",
+            source: "QR Offer Form"
+          }
+        }
+      };
+      step({ system: "REX", title: "Create new buyer contact", request: createReq });
+      await sleep(DUMMY_API.latencyMs);
+      const id = uid("CONT");
+      step({ system: "REX", title: "Contact created", response: { result: { id, _new: true } } });
+      return { id, _created: true };
+    },
+
+    async _rexCreateOffer(d, contact, step) {
+      const c = DUMMY_API.rex;
+      const url = c.baseUrl + c.endpoints.createOffer.replace("{listingId}", d.listingId);
+      const req = {
+        method: "POST",
+        url,
+        headers: { Authorization: "Bearer " + c.token, "Content-Type": "application/json" },
+        body: {
+          data: {
+            listing_id: d.listingId,
+            buyer_contact_id: contact.id,
+            amount: Number(d.offerPrice),
+            deposit: Number(d.deposit || 0),
+            finance: d.finance,
+            finance_days: d.financeDays || null,
+            building_pest_days: d.bpDays || null,
+            settlement_days: d.settlementDays || null,
+            conditions: d.conditions || "",
+            status: "offer_received"
+          }
+        }
+      };
+      step({ system: "REX", title: "Create offer under listing", request: req });
+      await sleep(DUMMY_API.latencyMs);
+      const id = uid("OFR-REX");
+      step({ system: "REX", title: "Offer logged in REX", response: { result: { id, listing_id: d.listingId } } });
+      return { id };
+    },
+
+    async _realworksCreateContract(d, contact, step) {
+      const c = DUMMY_API.realworks;
+      const req = {
+        method: "POST",
+        url: c.baseUrl + c.endpoints.createForm,
+        headers: {
+          "X-Api-Key": c.apiKey,
+          "X-User-Token": c.userToken,
+          "Content-Type": "application/json"
+        },
+        body: {
+          template: c.endpoints.formTemplate,
+          fields: {
+            property_address: d.address,
+            seller_agent: d.agent,
+            buyer_1_name: d.buyer1Name,
+            buyer_1_email: d.buyer1Email,
+            buyer_1_phone: d.buyer1Mobile,
+            buyer_2_name: d.buyer2Name || "",
+            purchase_price: Number(d.offerPrice),
+            deposit: Number(d.deposit || 0),
+            finance_clause: d.finance === "subject_to_finance"
+              ? ("Subject to finance · " + (d.financeDays || "?") + " days · " + (d.lender || ""))
+              : "Cash / not subject to finance",
+            building_pest: d.bpDays ? ("Subject to B&P · " + d.bpDays + " days") : "Waived",
+            settlement: (d.settlementDays || "?") + " days from contract",
+            buyer_solicitor: d.solicitorFirm || "",
+            special_conditions: d.conditions || ""
+          }
+        }
+      };
+      step({ system: "Realworks", title: "Create & populate Contract of Sale", request: req });
+      await sleep(DUMMY_API.latencyMs);
+      const formId = uid("RW");
+      const url = "https://app.formslive.com.au/forms/" + formId + "?demo=1";
+      step({ system: "Realworks", title: "Contract ready for review / e-sign", response: { formId, url, status: "draft" } });
+      return { formId, url };
+    }
+  };
+
+  global.MockApi = MockApi;
+})(window);
+
+</script>
+<script>
+const $ = (s,r=document)=>r.querySelector(s);
+const fmt = (n)=> "$"+Number(n||0).toLocaleString();
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600);}
+
+function offerCard(o){
+  const d=o.data;
+  const badge = `<span class="badge ${o.status}">${o.status}</span>`;
+  const fin = d.finance==="subject_to_finance" ? "Subject to finance" : "Cash";
+  return `<div class="offer-card" data-id="${o.id}">
+    <div class="top">
+      <div class="price">${fmt(d.offerPrice)}</div>${badge}
+    </div>
+    <div class="muted small">${d.address}</div>
+    <dl class="kv">
+      <dt>Buyer</dt><dd>${d.buyer1Name||"—"}</dd>
+      <dt>Terms</dt><dd>${fin} · ${d.settlementDays||"?"} day settlement</dd>
+      <dt>Received</dt><dd>${new Date(o.submittedAt).toLocaleString()}</dd>
+      ${o.status==="approved" ? `<dt>REX offer</dt><dd>${o.integration.rexOfferId}</dd>` : ""}
+      ${o.status==="rejected" ? `<dt>Reason</dt><dd>${o.rejectReason||"—"}</dd>` : ""}
+    </dl>
+  </div>`;
+}
+
+function render(){
+  const pend = MockApi.listOffers("pending");
+  const dec  = MockApi.listOffers().filter(o=>o.status!=="pending");
+  $("#pendCount").textContent = pend.length ? `(${pend.length})` : "";
+  $("#pending").innerHTML = pend.length ? pend.map(offerCard).join("")
+    : `<div class="empty">${t("emptyPending")}</div>`;
+  $("#decided").innerHTML = dec.length ? dec.map(offerCard).join("")
+    : `<div class="empty">${t("emptyDecided")}</div>`;
+  document.querySelectorAll(".offer-card").forEach(c=>{
+    c.addEventListener("click", ()=> openOffer(c.dataset.id));
+  });
+}
+
+function consoleLine(e){
+  const sys = e.system;
+  const payload = e.request ? e.request : e.response;
+  const label = e.request ? "REQUEST" : "RESPONSE";
+  return `<div class="line ${sys}">
+    <span class="tag ${sys}">${sys}</span> <span class="ttl">${e.title}</span>
+    <span class="muted" style="float:right">${label}</span>
+    <pre>${JSON.stringify(payload,null,2)}</pre>
+  </div>`;
+}
+
+function openOffer(id){
+  const o = MockApi.getOffer(id); if(!o) return;
+  const d = o.data;
+  const editable = o.status==="pending";
+  const fin = d.finance==="subject_to_finance"
+      ? `Subject to finance${d.financeDays?` · ${d.financeDays} days`:""}${d.lender?` · ${d.lender}`:""}`
+      : "Cash / not subject to finance";
+  const bp = d.bpDays ? `Subject to B&amp;P · ${d.bpDays} days` : "Waived";
+
+  let body = `
+    <div class="muted small" style="margin-bottom:4px">${d.address} · Ref ${d.ref||""}</div>
+    <dl class="kv" style="grid-template-columns:170px 1fr">
+      <dt>Buyer 1</dt><dd>${d.buyer1Name} · ${d.buyer1Mobile} · ${d.buyer1Email}</dd>
+      ${d.buyer2Name?`<dt>Buyer 2</dt><dd>${d.buyer2Name} ${d.buyer2Email?("· "+d.buyer2Email):""}</dd>`:""}
+      <dt>Deposit</dt><dd>${fmt(d.deposit)}</dd>
+      <dt>Finance</dt><dd>${fin}</dd>
+      <dt>Building &amp; pest</dt><dd>${bp}</dd>
+      <dt>Settlement</dt><dd>${d.settlementDays||"?"} days from contract</dd>
+      ${d.solicitorFirm?`<dt>Solicitor</dt><dd>${d.solicitorFirm} ${d.solicitorPhone?("· "+d.solicitorPhone):""}</dd>`:""}
+      ${d.conditions?`<dt>Special conditions</dt><dd>${d.conditions}</dd>`:""}
+    </dl>`;
+
+  if (editable){
+    body += `
+      <div class="row" style="margin-top:6px">
+        <div class="field"><label>Offer price (you can adjust before pushing)</label>
+          <input id="editPrice" value="${d.offerPrice}"></div>
+        <div class="field"><label>Deposit</label><input id="editDeposit" value="${d.deposit}"></div>
+      </div>
+      <div class="field"><label>Agent notes / amended conditions</label>
+        <textarea id="editConditions">${d.conditions||""}</textarea></div>
+      <div class="btnrow">
+        <button class="btn btn-ok" id="approveBtn">✓ Approve &amp; push to REX + Realworks</button>
+        <button class="btn btn-bad" id="rejectBtn">Reject</button>
+      </div>
+      <div id="liveResult"></div>`;
+  } else if (o.status==="approved"){
+    const i=o.integration;
+    body += `
+      <div class="result-box">
+        <strong>Pushed to REX &amp; Realworks ✓</strong>
+        <dl class="kv" style="grid-template-columns:170px 1fr;margin-top:8px">
+          <dt>REX contact</dt><dd>${i.rexContactId} ${i.rexContactNew?"(new)":"(existing)"}</dd>
+          <dt>REX offer</dt><dd>${i.rexOfferId}</dd>
+          <dt>Realworks form</dt><dd>${i.realworksFormId}</dd>
+          <dt>Contract link</dt><dd><a href="${i.realworksUrl}" target="_blank" rel="noopener">Open contract (demo)</a></dd>
+        </dl>
+      </div>
+      <h2 style="margin-top:18px">Integration console</h2>
+      <div class="console">${i.log.map(consoleLine).join("")}</div>`;
+  } else {
+    body += `<div class="result-box bad"><strong>Rejected.</strong> ${o.rejectReason||""}</div>`;
+  }
+
+  $("#mTitle").textContent = `Offer ${o.id} · ${fmt(d.offerPrice)}`;
+  $("#mBody").innerHTML = body;
+  $("#modalBg").classList.add("open");
+
+  if (editable){
+    $("#approveBtn").addEventListener("click", ()=>doApprove(o.id));
+    $("#rejectBtn").addEventListener("click", ()=>doReject(o.id));
+  }
+}
+
+async function doApprove(id){
+  const price = $("#editPrice")?.value, dep = $("#editDeposit")?.value, cond = $("#editConditions")?.value;
+  // apply agent edits back onto the record before pushing
+  const o = MockApi.getOffer(id);
+  if (price) o.data.offerPrice = price;
+  if (dep) o.data.deposit = dep;
+  if (cond!=null) o.data.conditions = cond;
+  MockApi.listOffers(); // no-op read
+  localStorage.setItem("offerToRex.offers.v1", JSON.stringify(
+    MockApi.listOffers().map(x=> x.id===id ? o : x)));
+
+  const btn = $("#approveBtn"); btn.disabled=true; btn.textContent="Pushing…";
+  const live = $("#liveResult");
+  live.innerHTML = `<h2 style="margin-top:18px">Integration console</h2><div class="console" id="liveConsole"></div>`;
+  const con = $("#liveConsole");
+
+  const res = await MockApi.approveOffer(id, "Emily Xiong", (entry)=>{
+    con.insertAdjacentHTML("beforeend", consoleLine(entry));
+    con.scrollTop = con.scrollHeight;
+  });
+
+  if (res.ok){
+    const i=res.integration;
+    live.insertAdjacentHTML("afterbegin", `
+      <div class="result-box">
+        <strong>Done ✓ — offer is now in REX and a Realworks contract is ready.</strong>
+        <dl class="kv" style="grid-template-columns:170px 1fr;margin-top:8px">
+          <dt>REX contact</dt><dd>${i.rexContactId} ${i.rexContactNew?"(new)":"(existing)"}</dd>
+          <dt>REX offer</dt><dd>${i.rexOfferId}</dd>
+          <dt>Realworks form</dt><dd><a href="${i.realworksUrl}" target="_blank" rel="noopener">Open pre-filled contract (demo)</a></dd>
+        </dl>
+      </div>`);
+    btn.textContent="Approved ✓";
+    toast("Pushed to REX + Realworks");
+    render();
+  }
+}
+
+async function doReject(id){
+  const reason = prompt("Reason for rejecting this offer (optional):","");
+  if (reason===null) return;
+  await MockApi.rejectOffer(id, reason, "Emily Xiong");
+  $("#modalBg").classList.remove("open");
+  toast("Offer rejected");
+  render();
+}
+
+/* sample offer seeding for quick demos — spread across both listings */
+const SAMPLE_BUYERS = {
+  "13253616": [
+    {buyer1Name:"Daniel Nguyen",buyer1Mobile:"0412 884 220",buyer1Email:"daniel.nguyen@email.com",
+     offerPrice:"915000",deposit:"45000",finance:"subject_to_finance",financeDays:"21",lender:"CommBank",
+     bpDays:"7",settlementDays:"30",conditions:"Keen to move quickly — flexible on settlement.",
+     solicitorFirm:"Sunnybank Conveyancing",solicitorPhone:"07 3344 9100"},
+    {buyer1Name:"Priya & Arjun Sharma",buyer1Mobile:"0438 110 776",buyer1Email:"sharma.family@email.com",
+     offerPrice:"902500",deposit:"50000",finance:"cash",settlementDays:"45",
+     conditions:"Cash buyers, no finance clause.",solicitorFirm:"Patel Legal"}
+  ],
+  "13243059": [
+    {buyer1Name:"Michael & Tina Brown",buyer1Mobile:"0401 552 318",buyer1Email:"brown.household@email.com",
+     offerPrice:"1285000",deposit:"64000",finance:"subject_to_finance",financeDays:"14",lender:"Westpac",
+     bpDays:"7",settlementDays:"30",conditions:"Pre-auction offer — would like to secure before 11 Jul.",
+     solicitorFirm:"Mansfield Legal Co",solicitorPhone:"07 3349 5500"},
+    {buyer1Name:"Wei Chen",buyer1Mobile:"0466 207 884",buyer1Email:"wei.chen@email.com",
+     offerPrice:"1250000",deposit:"75000",finance:"cash",settlementDays:"60",
+     conditions:"Cash, flexible settlement to suit vendor."}
+  ]
+};
+let seedIdx = 0;
+function seed(){
+  const ids = Object.keys(LISTINGS);
+  const id = ids[seedIdx % ids.length]; seedIdx++;
+  const L = LISTINGS[id];
+  const pool = SAMPLE_BUYERS[id];
+  const s = pool[Math.floor(Math.random()*pool.length)];
+  MockApi.submitOffer(Object.assign({
+    listingId:L.listingId, ref:L.ref, address:L.address, agent:L.agent,
+    beds:L.beds, baths:L.baths, cars:L.cars
+  }, s)).then(()=>{render();toast("Sample offer added · "+L.address.split(",")[0]);});
+}
+
+$("#mClose").addEventListener("click", ()=> $("#modalBg").classList.remove("open"));
+$("#modalBg").addEventListener("click", (e)=>{ if(e.target.id==="modalBg") $("#modalBg").classList.remove("open"); });
+$("#refreshBtn").addEventListener("click", render);
+$("#seedBtn").addEven
